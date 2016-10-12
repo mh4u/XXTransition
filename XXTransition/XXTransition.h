@@ -52,7 +52,6 @@ typedef NS_OPTIONS(NSUInteger, GoodJobType) {
 //TransitionKey
 UIKIT_EXTERN NSString *const XXTransitionAnimationNavPage;
 UIKIT_EXTERN NSString *const XXTransitionAnimationNavSink;
-UIKIT_EXTERN NSString *const XXTransitionAnimationNavFragment;
 
 UIKIT_EXTERN NSString *const XXTransitionAnimationModalSink;
 

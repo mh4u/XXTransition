@@ -382,6 +382,7 @@
 				6B7A5D321DADC8E400B3A771 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

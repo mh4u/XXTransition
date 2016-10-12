@@ -12,7 +12,6 @@
 
 NSString *const XXTransitionAnimationNavPage = @"XXTransitionAnimationNavPage";
 NSString *const XXTransitionAnimationNavSink = @"XXTransitionAnimationNavSink";
-NSString *const XXTransitionAnimationNavFragment = @"XXTransitionAnimationNavFragment";
 
 NSString *const XXTransitionAnimationModalSink = @"XXTransitionAnimationModalSink";
 
@@ -88,6 +87,7 @@ NSString *const XXTransitionAnimationModalSink = @"XXTransitionAnimationModalSin
         UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
         UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
         UIView *containerView = [transitionContext containerView];
+
         UIView *fromView = fromVC.view;
         UIView *toView = toVC.view;
 //        [containerView addSubview:fromView];  containerView会自动添加addSubview:fromView
@@ -134,43 +134,45 @@ NSString *const XXTransitionAnimationModalSink = @"XXTransitionAnimationModalSin
 
 + (void)addPushPageAnimation {
     [self addPushAnimation:XXTransitionAnimationNavPage animation:^(id<UIViewControllerContextTransitioning>  _Nonnull transitionContext, NSTimeInterval duration) {
-        UIView *fromView = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey].view;
-        UIView *toView = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey].view;
+        UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
+        UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
+        UIView *tempView = [fromVC.view snapshotViewAfterScreenUpdates:NO];
         UIView *containerView = [transitionContext containerView];
         
-        [containerView addSubview:toView];
-//        CGPoint point = CGPointMake(0, 0.5);
-//        fromView.frame = CGRectOffset(fromView.frame, (point.x - fromView.layer.anchorPoint.x) * fromView.frame.size.width, (point.y - fromView.layer.anchorPoint.y) * fromView.frame.size.height);
-//        fromView.layer.anchorPoint = point;
-//        CATransform3D transfrom3d = CATransform3DIdentity;
-//        transfrom3d.m34 = -0.002;
-//        containerView.layer.sublayerTransform = transfrom3d;
+        [containerView addSubview:toVC.view];
+        [containerView addSubview:tempView];
+    
+        [self setAnchorPoint:CGPointMake(0, 0.5) forView:tempView];
         
         [UIView animateWithDuration:duration animations:^{
-            fromView.layer.transform = CATransform3DMakeRotation(-M_PI_2, 1, 1, 0);
-            
+            tempView.layer.transform = [self pushTransformPush];
         } completion:^(BOOL finished) {
-           [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+            //tempView要清理，不要保留到pop时取出来使用，否则如果transition换了另外一个，该tempView依然会被保留到containerView中
+            [tempView removeFromSuperview];
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
-        
     }];
 }
 
 
 + (void)addPopPageAnimation {
     [self addPopAnimation:XXTransitionAnimationNavPage animation:^(id<UIViewControllerContextTransitioning>  _Nonnull transitionContext, NSTimeInterval duration) {
-        UIView *fromView = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey].view;
+
         UIView *toView = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey].view;
         
         UIView *containerView = [transitionContext containerView];
-        [containerView addSubview:toView];
+        UIView *tempView = [toView snapshotViewAfterScreenUpdates:YES];
+        [self setAnchorPoint:CGPointMake(0, 0.5) forView:tempView];
+        tempView.layer.transform = [self pushTransformPush];
+        [containerView addSubview:tempView];
+        [containerView insertSubview:toView atIndex:0];
         
         [UIView animateWithDuration:duration animations:^{
-            toView.layer.transform = CATransform3DIdentity;
-            toView.alpha = 0.2;
+            tempView.layer.transform = CATransform3DIdentity;
             
         } completion:^(BOOL finished) {
-             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+            [tempView removeFromSuperview];
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
         
     }];
@@ -208,11 +210,6 @@ NSString *const XXTransitionAnimationModalSink = @"XXTransitionAnimationModalSin
             }];
         } completion:^(BOOL finished) {
             [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-//            if ([transitionContext transitionWasCancelled]) {
-//                fromView.hidden = NO;
-//                [tempView removeFromSuperview];
-//                [toView removeFromSuperview];
-//            }
         }];
     }];
 }
@@ -246,14 +243,13 @@ NSString *const XXTransitionAnimationModalSink = @"XXTransitionAnimationModalSin
     }];
 }
 
-
+#pragma mark - CATransform3D
 + (CATransform3D)sinkTransformFirstPeriod{
     CATransform3D t = CATransform3DIdentity;
     t.m34 = 1.0/-900;
     t = CATransform3DTranslate(t, 0, 0, -100);
     t = CATransform3DRotate(t, 15.0 * M_PI/180.0, 1, 0, 0);
     return t;
-    
 }
 
 + (CATransform3D)sinkTransformSecondPeriod{
@@ -263,6 +259,23 @@ NSString *const XXTransitionAnimationModalSink = @"XXTransitionAnimationModalSin
     t = CATransform3DScale(t, 0.8, 0.8, 1);
     return t;
 }
+
++ (CATransform3D)pushTransformPush{
+    CATransform3D t = CATransform3DIdentity;
+    t.m34 = -1.0/500;
+    t = CATransform3DRotate(t, -M_PI_2, 0, 1, 0);
+    return t;
+}
+
+
+#pragma mark - helper
++ (void)setAnchorPoint:(CGPoint)anchorpoint forView:(UIView *)view {
+    CGRect oldFrame = view.frame;
+    view.layer.anchorPoint = anchorpoint;
+    view.frame = oldFrame;
+}
+
+
 
 @end
 

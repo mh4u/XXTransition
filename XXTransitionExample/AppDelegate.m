@@ -31,10 +31,10 @@
 
 - (void)transitionSetting {
     //启动
-    [XXTransition startGoodJob:GoodJobTypeAll transitionDuration:0.25];
+    [XXTransition startGoodJob:GoodJobTypeAll transitionDuration:0.3];
     
     //更改全局NavTransiton效果
-    [XXTransition setNavTransitonKey:XXTransitionAnimationNavFragment];
+    [XXTransition setNavTransitonKey:XXTransitionAnimationNavPage];
     
     //自定义特殊ViewController的NavTransiton效果和返回手势
     [XXTransition registerPushViewController:[SinkVC class] forTransitonKey:XXTransitionAnimationNavSink];
@@ -45,14 +45,13 @@
     //添加自定义NavTransiton效果
     NSString *demoTransitionAnimationFragment = @"demoTransitionAnimationFragment";
     [XXTransition addPushAnimation:demoTransitionAnimationFragment animation:^(id<UIViewControllerContextTransitioning> transitionContext, NSTimeInterval duration) {
+        
         UIViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
         UIViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
         UIView *containerView = [transitionContext containerView];
-        
         UIView *toVCTempView = [toVC.view snapshotViewAfterScreenUpdates:YES];
-        
         [containerView addSubview:toVC.view];
-        [containerView addSubview:fromVC.view];
+        [containerView sendSubviewToBack:toVC.view];
         
         NSMutableArray *fragmentViews = [[NSMutableArray alloc] init];
         
@@ -86,14 +85,7 @@
             for (UIView *fragmentView in fragmentViews) {
                 [fragmentView removeFromSuperview];
             }
-            if ([transitionContext transitionWasCancelled]) {
-                [transitionContext completeTransition:NO];
-                fromVC.view.hidden = NO;
-            }else{
-                [transitionContext completeTransition:YES];
-                fromVC.view.hidden = NO;
-            }
-            
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
     }];
     
@@ -124,9 +116,6 @@
             
         }
         
-        toVC.view.hidden = NO;
-        fromVC.view.hidden = YES;
-        
         [UIView animateWithDuration:duration animations:^{
             for (UIView *fragmentView in fragmentViews) {
                 
@@ -140,14 +129,7 @@
             for (UIView *fragmentView in fragmentViews) {
                 [fragmentView removeFromSuperview];
             }
-            if ([transitionContext transitionWasCancelled]) {
-                [transitionContext completeTransition:NO];
-                fromVC.view.hidden = NO;
-            }else{
-                [transitionContext completeTransition:YES];
-                fromVC.view.hidden = NO;
-            }
-            
+            [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
         }];
         
     }];

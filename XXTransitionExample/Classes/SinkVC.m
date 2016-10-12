@@ -8,6 +8,7 @@
 
 #import "SinkVC.h"
 #import "FragmentVC.h"
+#import "XXMacro.h"
 @interface SinkVC ()
 
 @end
@@ -34,6 +35,10 @@
 - (void)pushAction {
     FragmentVC *ctrler = [[FragmentVC alloc] init];
     [self.navigationController pushViewController:ctrler animated:YES];
+}
+
+- (void)dealloc {
+    XXLog(@"%@--销毁",self);
 }
 
 @end
