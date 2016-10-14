@@ -22,6 +22,9 @@ typedef NS_OPTIONS(NSUInteger, GoodJobType) {
 
 /*
  启动自定义转场
+ 
+ @param 全局设置XXTransition工作类型
+ @param 转场动画持续时间
  */
 + (void)startGoodJob:(GoodJobType)goodJobType transitionDuration:(NSTimeInterval)duration;
 

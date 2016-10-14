@@ -11,7 +11,7 @@
 #import "UIViewController+XXTransition.h"
 #import "XXTransition.h"
 #import "ModalVC.h"
-#import "UIViewController+XXTransition.h"
+
 static NSString *RootVCCellId = @"RootVCCellId";
 @interface RootVC ()<UITableViewDelegate, UITableViewDataSource>
 
@@ -50,9 +50,6 @@ static NSString *RootVCCellId = @"RootVCCellId";
 }
 
 #pragma mark - Table
-
-
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return _data.count;
 }
@@ -73,6 +70,7 @@ static NSString *RootVCCellId = @"RootVCCellId";
         [self.navigationController pushViewController:vc animated:YES];
     } else {
         ModalVC *vc = [[ModalVC alloc] init];
+        //XXTransition Modal转场
         [self xx_presentViewController:vc makeAnimatedTransitioning:^(XXAnimatedTransitioning * _Nonnull transitioning) {
             transitioning.duration = 0.5;
             transitioning.animationKey = @"DemoTransitionAnimationModalSink";

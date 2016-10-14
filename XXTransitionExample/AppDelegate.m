@@ -20,6 +20,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
     [self transitionSetting];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -30,7 +31,8 @@
 }
 
 - (void)transitionSetting {
-    //启动
+    
+    //启动XXTransition自定义转场
     [XXTransition startGoodJob:GoodJobTypeAll transitionDuration:0.3];
     
     //更改全局NavTransiton效果
